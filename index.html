@@ -172,7 +172,21 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h1 id="关于HDFS读写过程的理解"><a href="#关于HDFS读写过程的理解" class="headerlink" title="关于HDFS读写过程的理解"></a>关于HDFS读写过程的理解</h1><p>最近看了一些关于HDFS的论文，把这里面的一些思考写下来</p>
+<p>因为初次接触，有不对的地方请批评指正。</p>
+<p><strong>写过程</strong></p>
+<p>用户端提出写文件的请求，而接受这个请求的是云端的Namenode,Namenode 中保存的是实际存储信息，包括哪些地方可以进行存储，存储情况，数据块和文件的对应关系等。</p>
+<p>1.首先检查文件是否存在，通过检查之后，namenode将创建相应的记录，之后namenode会返回给客户一个可用的datanode列表。</p>
+<p>2.在客户进行数据传输的时候，先将数据划分成包，写入一个内部队列，数据流来处理这些队列中的包，根据Namenode返回的列表信息，以及要求的副本数（例如副本要求是3），这一组的datanode会形成3个输入节点，当包流向第一个副本datanode的时候，这个节点会存储数据并向第二个副本的datanode发送数据，同样的这个节点会保存数据并流向第三副本的datanode。</p>
+<p>3.datanode每收到相应的数据包都会给客户端发送相应的确认，收到确认后客户才会把队列中的相应数据源删除。当客户完成写操作之后，会发送信息给namenode,确认已经完成操作。</p>
+<p><strong>读过程</strong></p>
+<p>1.用户提出读文件的请求，把请求发送到namenode。namenode根据请求的文件，返回给用户保存数据块的数据节点的地址信息。</p>
+<p>2.datanode会根据与用户距离的远近进行连接，然后进行文件读取，返回给用户相应的数据。</p>
+<p>3.当一个datanode的数据被读取完毕之后，关闭与该datanode的数据连接，寻找下一个数据节点，直到文件完全读取完毕。</p>
+<p>4.关闭数据流</p>
+<p><strong>思考</strong></p>
+<p>首先通过论文的一些解读，了解了一些HDFS的基本存储过程。论文中大部分的问题都是关于怎么布置副本位置达到负载均衡，怎么根据文件的热度来平衡副本数量，怎么高效的存储。以后还需要加强相关知识的学习。</p>
+
       
 
       
@@ -180,6 +194,17 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">first</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -438,6 +463,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">first</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
