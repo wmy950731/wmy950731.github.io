@@ -6,23 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>关于HDFS读取详细过程以及现在研究的方向 | HDFS����ѧϰ����</title>
+  <title>关于HDFS读写的详细过程以及现在研究的方向 | HDFS����ѧϰ����</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="关于HDFS读取详细过程以及现在研究的方向">
-<meta name="keywords" content="HDFS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于HDFS读取详细过程以及现在研究的方向">
-<meta property="og:url" content="http://yoursite.com/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/index.html">
+<meta property="og:title" content="关于HDFS读写的详细过程以及现在研究的方向">
+<meta property="og:url" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/index.html">
 <meta property="og:site_name" content="HDFS����ѧϰ����">
 <meta property="og:description" content="关于HDFS读取详细过程以及现在研究的方向">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/D:/vino/hexs/source/_posts/assets/20171114122153681-1545808490903.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/D:/vino/hexs/source/_posts/assets/20171114122211381.png">
-<meta property="og:updated_time" content="2018-12-26T07:15:45.504Z">
+<meta property="og:image" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122153681.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122211381.png">
+<meta property="og:updated_time" content="2018-12-26T07:37:32.342Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于HDFS读取详细过程以及现在研究的方向">
+<meta name="twitter:title" content="关于HDFS读写的详细过程以及现在研究的方向">
 <meta name="twitter:description" content="关于HDFS读取详细过程以及现在研究的方向">
-<meta name="twitter:image" content="http://yoursite.com/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/D:/vino/hexs/source/_posts/assets/20171114122153681-1545808490903.png">
+<meta name="twitter:image" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122153681.png">
   
     <link rel="alternative" href="/atom.xml" title="HDFS����ѧϰ����" type="application/atom+xml">
   
@@ -158,20 +157,20 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-关于HDFS读取详细过程以及现在研究的方向" class="article article-type-post " itemscope="" itemprop="blogPost">
+            <article id="post-关于HDFS读写的详细过程以及现在研究的方向" class="article article-type-post " itemscope="" itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      关于HDFS读取详细过程以及现在研究的方向
+      关于HDFS读写的详细过程以及现在研究的方向
     </h1>
   
 
         
-        <a href="/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/" class="archive-article-date">
-  	<time datetime="2018-12-26T02:03:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-26</time>
+        <a href="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" class="archive-article-date">
+  	<time datetime="2018-12-26T07:30:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-26</time>
 </a>
         
       </header>
@@ -200,7 +199,7 @@
 <p>对于客户端主要监听用户的操作命令。（例如读文件，写文件，删除，移动等）</p>
 <p>处理就是根据监听做出处理。</p>
 <p><strong>文件的读过程详解</strong></p>
-<p><img src="/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/D:/vino\hexs\source\_posts\assets\20171114122153681-1545808490903.png" alt="20171114122153681"></p>
+<p><img src="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122153681.png" alt="20171114122153681"></p>
 <p>1.首先客户端发出读文件请求，namenode返回给相应文件的元数据，获得这个文件的数据块位置列表。</p>
 <p>2.就近挑选一台datanode服务器，请求建立输入流 。</p>
 <p>如何挑选就近的datanode服务器：</p>
@@ -220,7 +219,7 @@
 <p>packet<br>packet是第二大的单位，它是客户端向DataNode，或DataNode之间传输传数据的基本单位，默认64KB。</p>
 <p>chunk<br>chunk是最小的单位，它是客户端向DataNode，或DataNode之间进行传输数据校验的基本单位，默认512Byte，因为用作校验，故每个chunk需要带有4Byte的校验位。所以实际每个chunk写入packet的大小为516Byte。由此可见真实数据与校验值数据的比值约为128 : 1。（即64*1024 / 512）</p>
 <p>例如（1）在客户端向DataNode传数据的时候，输出数据流会有一个chunk buff，写满一个chunk后，会计算校验和并写入当前的chunk。之后再把带有校验和的chunk写入packet，当一个packet写满后，packet会进入dataQueue队列，其他的DataNode就是从这个dataQueue获取client端上传的数据并存储的。同时一个DataNode成功存储一个packet后之后会返回一个ack packet，放入ack Queue中。</p>
-<p><img src="/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/D:/vino\hexs\source\_posts\assets\20171114122211381.png" alt="20171114122211381"></p>
+<p><img src="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122211381.png" alt="20171114122211381"></p>
 <p>1.首先客户端向NameNode发出写文件请求。</p>
 <p>2.检查文件是否存在，并检查权限，通过检查后，直接先把操作记录到上文提到的编辑日志文件，并返回输出流对象。</p>
 <p>3.客户端需要将数据块按照128MB进行切片。</p>
@@ -282,17 +281,6 @@
     <div class="article-info article-info-index">
       
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">HDFS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
       
 
       
@@ -343,7 +331,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -357,18 +345,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          关于HDFS读写的详细过程以及现在研究的方向
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/12/25/关于HDFS读写理解/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">关于HDFS读写理解</div>
+    <a href="/2018/12/26/关于HDFS读取详细过程以及现在研究的方向/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">关于HDFS读取详细过程以及现在研究的方向</div>
       <i class="icon-circle-right"></i>
     </a>
   
