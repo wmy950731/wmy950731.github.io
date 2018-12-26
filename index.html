@@ -194,7 +194,7 @@
 <p>对于客户端主要监听用户的操作命令。（例如读文件，写文件，删除，移动等）</p>
 <p>处理就是根据监听做出处理。</p>
 <p><strong>文件的读过程详解</strong></p>
-<p><img src="F:\HDFS论文\20171114122153681.png" alt="20171114122153681"></p>
+<p><img src="D:\vino\hexs\source\img\20171114122153681.png" alt="20171114122153681"></p>
 <p>1.首先客户端发出读文件请求，namenode返回给相应文件的元数据，获得这个文件的数据块位置列表。</p>
 <p>2.就近挑选一台datanode服务器，请求建立输入流 。</p>
 <p>如何挑选就近的datanode服务器：</p>
@@ -214,7 +214,7 @@
 <p>packet<br>packet是第二大的单位，它是客户端向DataNode，或DataNode之间传输传数据的基本单位，默认64KB。</p>
 <p>chunk<br>chunk是最小的单位，它是客户端向DataNode，或DataNode之间进行传输数据校验的基本单位，默认512Byte，因为用作校验，故每个chunk需要带有4Byte的校验位。所以实际每个chunk写入packet的大小为516Byte。由此可见真实数据与校验值数据的比值约为128 : 1。（即64*1024 / 512）</p>
 <p>例如（1）在客户端向DataNode传数据的时候，输出数据流会有一个chunk buff，写满一个chunk后，会计算校验和并写入当前的chunk。之后再把带有校验和的chunk写入packet，当一个packet写满后，packet会进入dataQueue队列，其他的DataNode就是从这个dataQueue获取client端上传的数据并存储的。同时一个DataNode成功存储一个packet后之后会返回一个ack packet，放入ack Queue中。</p>
-<p><img src="F:\HDFS论文\20171114122211381.png" alt="20171114122211381"></p>
+<p><img src="D:\vino\hexs\source\img\20171114122211381.png" alt="20171114122211381"></p>
 <p>1.首先客户端向NameNode发出写文件请求。</p>
 <p>2.检查文件是否存在，并检查权限，通过检查后，直接先把操作记录到上文提到的编辑日志文件，并返回输出流对象。</p>
 <p>3.客户端需要将数据块按照128MB进行切片。</p>
