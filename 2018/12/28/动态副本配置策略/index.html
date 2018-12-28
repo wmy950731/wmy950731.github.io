@@ -6,20 +6,31 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>关于HDFS读写理解 | Learning HDFS</title>
+  <title>Learning HDFS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="关于HDFS读写过程的理解">
-<meta name="keywords" content="first">
+  <meta name="description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags:HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于HDFS读写理解">
-<meta property="og:url" content="http://yoursite.com/2018/12/25/关于HDFS读写理解/index.html">
+<meta property="og:title" content="Learning HDFS">
+<meta property="og:url" content="http://yoursite.com/2018/12/28/动态副本配置策略/index.html">
 <meta property="og:site_name" content="Learning HDFS">
-<meta property="og:description" content="关于HDFS读写过程的理解">
+<meta property="og:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags:HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-12-25T09:39:57.095Z">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/1.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/2.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/3.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/4.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/5.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/6.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/7.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/8.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/9.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/10.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/11.png">
+<meta property="og:updated_time" content="2018-12-28T09:18:43.834Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于HDFS读写理解">
-<meta name="twitter:description" content="关于HDFS读写过程的理解">
+<meta name="twitter:title" content="Learning HDFS">
+<meta name="twitter:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags:HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+<meta name="twitter:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/1.png">
   
     <link rel="alternative" href="/atom.xml" title="Learning HDFS" type="application/atom+xml">
   
@@ -155,41 +166,116 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-关于HDFS读写理解" class="article article-type-post " itemscope="" itemprop="blogPost">
+            <article id="post-动态副本配置策略" class="article article-type-post " itemscope="" itemprop="blogPost">
   <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      关于HDFS读写理解
-    </h1>
-  
-
-        
-        <a href="/2018/12/25/关于HDFS读写理解/" class="archive-article-date">
-  	<time datetime="2018-12-25T06:12:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-25</time>
-</a>
-        
-      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="关于HDFS读写过程的理解"><a href="#关于HDFS读写过程的理解" class="headerlink" title="关于HDFS读写过程的理解"></a>关于HDFS读写过程的理解</h1><a id="more"></a>
-<p>最近看了一些关于HDFS的论文，把这里面的一些思考写下来</p>
-<p>因为初次接触，有不对的地方请批评指正。</p>
-<p><strong>写过程</strong></p>
-<p>用户端提出写文件的请求，而接受这个请求的是云端的Namenode,Namenode 中保存的是实际存储信息，包括哪些地方可以进行存储，存储情况，数据块和文件的对应关系等。</p>
-<p>1.首先检查文件是否存在，通过检查之后，namenode将创建相应的记录，之后namenode会返回给客户一个可用的datanode列表。</p>
-<p>2.在客户进行数据传输的时候，先将数据划分成包，写入一个内部队列，数据流来处理这些队列中的包，根据Namenode返回的列表信息，以及要求的副本数（例如副本要求是3），这一组的datanode会形成3个输入节点，当包流向第一个副本datanode的时候，这个节点会存储数据并向第二个副本的datanode发送数据，同样的这个节点会保存数据并流向第三副本的datanode。</p>
-<p>3.datanode每收到相应的数据包都会给客户端发送相应的确认，收到确认后客户才会把队列中的相应数据源删除。当客户完成写操作之后，会发送信息给namenode,确认已经完成操作。</p>
-<p><strong>读过程</strong></p>
-<p>1.用户提出读文件的请求，把请求发送到namenode。namenode根据请求的文件，返回给用户保存数据块的数据节点的地址信息。</p>
-<p>2.datanode会根据与用户距离的远近进行连接，然后进行文件读取，返回给用户相应的数据。</p>
-<p>3.当一个datanode的数据被读取完毕之后，关闭与该datanode的数据连接，寻找下一个数据节点，直到文件完全读取完毕。</p>
-<p>4.关闭数据流</p>
-<p><strong>思考</strong></p>
-<p>首先通过论文的一些解读，了解了一些HDFS的基本存储过程。论文中大部分的问题都是关于怎么布置副本位置达到负载均衡，怎么根据文件的热度来平衡副本数量，怎么高效的存储。以后还需要加强相关知识的学习。</p>
+        <p>title: 动态副本配置策略<br>date: 2018-12-28 16:07:28<br>tags:HDFS</p>
+<h3 id="问题："><a href="#问题：" class="headerlink" title="问题："></a><strong>问题：</strong></h3><p>1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。</p>
+<a id="more"></a>
+<p>2.针对访问文件的时候，由于默认的选择网络拓扑中就近的数据节点进行数据传输，没有考虑节点的负载性能。</p>
+<p>3.在最初放置副本的时候采取的是上篇博文的副本放置策略，但是在机架上选择节点都是随机的，将会影响集群的负载均衡。</p>
+<p><strong>解决方案：</strong></p>
+<p>对于问题1：</p>
+<p>设置动态的副本管理策略，根据文件的热度来动态增加副本的数量，而对于长期不被访问的副本进行删除，降低管理成本。</p>
+<p>对于问题3：</p>
+<p>在放置副本的问题上，考虑节点的存储性能和网络拓扑的距离。</p>
+<p>对于问题2：</p>
+<p>读文件选取副本的时候考虑，数据节点的服务能力。</p>
+<p>(补充解释上篇文章)机架感知策略：</p>
+<p>HDFS本来是不能自行判断网络拓扑情况，但是是HDFS中有各个节点的IP到rackid的映射表。</p>
+<p>那么什么是rackid信息？</p>
+<p>举个例子</p>
+<p><img src="/2018/12/28/动态副本配置策略/1.png" alt="1"></p>
+<p>其中D1,R1为交换机，H1为Datanode，那么H1的rackid就是/D1/R1/H1。那么也能更好的说明上篇博文中，为什么在返回数据访问列表时，如何排序的问题。</p>
+<p>其他分布式存储架构的副本策略：</p>
+<p>GFS（Google file system）：</p>
+<ol>
+<li><p>选择系统的使用率小于数据节点平均使用率的节点。</p>
+</li>
+<li><p>选择最近没有进行副本创建的节点</p>
+</li>
+<li><p>选择不同机架的节点</p>
+<h3 id="具体的解决方案："><a href="#具体的解决方案：" class="headerlink" title="具体的解决方案："></a><strong>具体的解决方案：</strong></h3><p><strong>针对副本放置</strong></p>
+<p>启动复制放置的时刻：</p>
+<p>用户写文件的时候</p>
+<p>动态增加副本的时候</p>
+<p>策略：</p>
+<p>对于时刻1：</p>
+<p>当用户请求发送写文件请求时，Namenode启动副本策略，选择存储性能最佳的节点的数据元信息给用户。然后用户进行数据传输。</p>
+<p>对于时刻2：</p>
+<p>当文件的热度超过了我们设定的阈值，Namenode对除了已有副本的节点进行存储性能进行评价。选择最佳的节点进行复制。</p>
+</li>
+</ol>
+<p>   <strong>针对副本选取</strong></p>
+<p>   策略：</p>
+<p>   对节点的服务性能进行排序（服务性能包括节点负载，网络间的传输时间）选择最优节点进行读文件。</p>
+<p>   注：对比原始根据距离进行排序，考虑了更多因素。</p>
+<p>   <strong>针对副本数量</strong></p>
+<p>   增加策略：</p>
+<p>   每隔一段时间对文件的热度进行审核。</p>
+<p>   根据用户的访问频率计算文件的热度，检查热度是否超过了设置的阈值。</p>
+<p>   如果超过阈值，则计算创建副本的个数。选择源节点进行复制。</p>
+<p>   删除策略：</p>
+<p>   每隔一定时间对文件的多个周期的热度进行统计，计算热度的平均值。</p>
+<p>   判定热度的平均值是否小于设定的阈值。小于则根据热度计算删除副本的个数。</p>
+<p>   若存在删除的副本，则优先删除存储空间理由率最高的节点。</p>
+<p>   <strong>针对副本放置策略的具体解释：</strong></p>
+<p>   节点性能的计算：</p>
+<p>   <img src="/2018/12/28/动态副本配置策略/2.png" alt="2"></p>
+<p>   注：k1，k2是存储空间和读写速度的权重系数。S(i)为存储空间的大小，V(i)为读写速度</p>
+<p>   <strong>存储性能</strong>的计算：</p>
+<p><img src="/2018/12/28/动态副本配置策略/3.png" alt="3"></p>
+<p>​              注：num(i)为节点i的数据块个数，P(i)为节点性能。</p>
+<p>具体的放置策略：</p>
+<p>第一副本，选择存储性能最高的数据节点进行存储。</p>
+<p>第二副本，在第一副本位置为中心，选择距离最近的N个节点进行存储性能评价，选择存储性能最高的作为第二副本。</p>
+<p>第三副本，选择方式与第二副本相同。</p>
+<p>依次类推选择其他副本。</p>
+<p><img src="/2018/12/28/动态副本配置策略/4.png" alt="4"></p>
+<p><strong>针对针对副本选取策略的具体解释：</strong></p>
+<p>节点服务性能参数计算</p>
+<p>节点负载：</p>
+<p><img src="/2018/12/28/动态副本配置策略/5.png" alt="5"></p>
+<p>注：只考虑了节点当前的请求数量（我认为考虑因素有些单一，但是这个论文是针对资源型数据，不考虑节点的计算能力）</p>
+<p>节点带宽：</p>
+<p><img src="/2018/12/28/动态副本配置策略/6.png" alt="6"></p>
+<p>注：size为数据块的大小，T为传输的时间，BW为i节点到j节点的带宽。</p>
+<p>服务能力：</p>
+<p><img src="/2018/12/28/动态副本配置策略/7.png" alt="7"></p>
+<p>根据服务能力将节点排序，择优选择。</p>
+<p><strong>根据文件热度创建副本的具体解释：</strong></p>
+<p>根据文件的访问次数来确定文件的热度</p>
+<p><img src="/2018/12/28/动态副本配置策略/8.png" alt="8"></p>
+<p>注：TotalNum(f)表示f数据节点在某个时间段访问次数的总和（这个总和并不是单纯的累加，而是为每个时间赋予了一个权重，离现在越近的周期，权重越大）Nt是统计周期的个数，Num是f数据节点在某个周期的访问次数。</p>
+<p>由文件的访问次数来确定访问的频率</p>
+<p>那么某个数据节点的的访问频率有如下定义：</p>
+<p><img src="/2018/12/28/动态副本配置策略/9.png" alt="9"></p>
+<p> 分子为扫描的时间。</p>
+<p>注：在设置统计周期个数（即Nt）的时候，这个统计个数是动态设置的。一般情况高热度文件的统计周期个数少于低热度的文件。这样设置有两个原因：</p>
+<ol>
+<li><p>如果时间窗口设置相同，则可能在同一时刻节点既要增加文件，又要删除文件，这个时间段就会减少数据节点的吞吐量。（即错开时间）</p>
+</li>
+<li><p>热点文件需要快速反应增加副本，而非热点文件经常去查看访问频率会造成系统的额外负担。</p>
+</li>
+</ol>
+<p>注：在实现的时候给N(t)设置为一个都一样的初始值，可以设置当一次判定为热点文件的时候，N(t)+1。被判定为非热点文件的时候N(t)-1。实现动态变化的目的。</p>
+<p>那么热点值就可以用访问频率来表示，热点文件的判定就需要我们设置的访问频率阈值来确定，如果某个节点的访问频率大于阈值则视为热点文件。判定为热点文件后，还需要确定增加副本的个数。</p>
+<p>针对副本增加个数可以根据以下的公式确定：</p>
+<p><img src="/2018/12/28/动态副本配置策略/10.png" alt="10"></p>
+<p>N(min)为最初的副本因子，N(f)为现在已有的副本数。H(f)/H(threshold)为访问频率和设置阈值的比值，（S(all)-S(used)）/S(all)为整个系统剩余存储资源的比值。</p>
+<p>注：这个公式不仅考虑了文件的热度，而且考虑了整个系统剩余的存储力。</p>
+<p><strong>针对副本删除问题的解释：</strong> </p>
+<p>和增加副本策略一样，根据访问频率来确定删除与否。</p>
+<p>根据以下公式来确定：</p>
+<p><img src="/2018/12/28/动态副本配置策略/11.png" alt="11"></p>
+<p>N(min)为最小的副本要求数，其他公式参数和增加副本公式的意义相同。</p>
+<p>那么确定了删除个数，那么就要确定删除副本的位置：</p>
+<p>本文采用的是优先选择存储资源利用率最高的数据节点。</p>
+<p>另外删除副本的扫描周期一般为3到5（避免单周期热度变化不具有代表性，造成不必要的删除）。</p>
+<p><strong>总结：</strong></p>
+<p>因为这篇论文考虑的是资源资源型数据，所以对于节点的性能只考虑访问的次数，那么针对其他的应用场景我们也需要动态调整个这个性能的参数，可以进一步的调整公式。另外还可以在删除副本的选择上进行改进，可以考虑访问频率最低和存储利用率最高，综合考虑节点副本来进行删除。</p>
 
       
 
@@ -219,17 +305,6 @@
     <div class="article-info article-info-index">
       
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">first</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
       
 
       
@@ -280,7 +355,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2018/12/25/关于HDFS读写理解/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2018/12/28/动态副本配置策略/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -294,15 +369,11 @@
   
 <nav id="article-nav">
   
-    <a href="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          关于HDFS读写的详细过程以及现在研究的方向
-        
-      </div>
-    </a>
   
+    <a href="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">关于HDFS读写的详细过程以及现在研究的方向</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 
