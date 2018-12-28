@@ -8,12 +8,12 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Learning HDFS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags:HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+  <meta name="description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags: HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Learning HDFS">
 <meta property="og:url" content="http://yoursite.com/2018/12/28/动态副本配置策略/index.html">
 <meta property="og:site_name" content="Learning HDFS">
-<meta property="og:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags:HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+<meta property="og:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags: HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/1.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/2.png">
@@ -26,10 +26,10 @@
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/9.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/10.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/11.png">
-<meta property="og:updated_time" content="2018-12-28T09:18:43.834Z">
+<meta property="og:updated_time" content="2018-12-28T09:27:23.478Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Learning HDFS">
-<meta name="twitter:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags:HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+<meta name="twitter:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags: HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta name="twitter:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/1.png">
   
     <link rel="alternative" href="/atom.xml" title="Learning HDFS" type="application/atom+xml">
@@ -171,7 +171,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>title: 动态副本配置策略<br>date: 2018-12-28 16:07:28<br>tags:HDFS</p>
+        <p>title: 动态副本配置策略<br>date: 2018-12-28 16:07:28<br>tags: HDFS</p>
 <h3 id="问题："><a href="#问题：" class="headerlink" title="问题："></a><strong>问题：</strong></h3><p>1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。</p>
 <a id="more"></a>
 <p>2.针对访问文件的时候，由于默认的选择网络拓扑中就近的数据节点进行数据传输，没有考虑节点的负载性能。</p>
