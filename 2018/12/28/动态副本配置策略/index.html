@@ -6,14 +6,15 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Learning HDFS</title>
+  <title>动态副本配置策略 | Learning HDFS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags: HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+  <meta name="description" content="问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+<meta name="keywords" content="HDFS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Learning HDFS">
+<meta property="og:title" content="动态副本配置策略">
 <meta property="og:url" content="http://yoursite.com/2018/12/28/动态副本配置策略/index.html">
 <meta property="og:site_name" content="Learning HDFS">
-<meta property="og:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags: HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+<meta property="og:description" content="问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/1.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/2.png">
@@ -26,10 +27,10 @@
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/9.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/10.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/11.png">
-<meta property="og:updated_time" content="2018-12-28T09:27:23.478Z">
+<meta property="og:updated_time" content="2018-12-28T09:32:36.045Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Learning HDFS">
-<meta name="twitter:description" content="title: 动态副本配置策略date: 2018-12-28 16:07:28tags: HDFS 问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
+<meta name="twitter:title" content="动态副本配置策略">
+<meta name="twitter:description" content="问题：1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。">
 <meta name="twitter:image" content="http://yoursite.com/2018/12/28/动态副本配置策略/1.png">
   
     <link rel="alternative" href="/atom.xml" title="Learning HDFS" type="application/atom+xml">
@@ -169,10 +170,24 @@
             <article id="post-动态副本配置策略" class="article article-type-post " itemscope="" itemprop="blogPost">
   <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      动态副本配置策略
+    </h1>
+  
+
+        
+        <a href="/2018/12/28/动态副本配置策略/" class="archive-article-date">
+  	<time datetime="2018-12-28T08:07:28.424Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-28</time>
+</a>
+        
+      </header>
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>title: 动态副本配置策略<br>date: 2018-12-28 16:07:28<br>tags: HDFS</p>
-<h3 id="问题："><a href="#问题：" class="headerlink" title="问题："></a><strong>问题：</strong></h3><p>1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。</p>
+        <h3 id="问题："><a href="#问题：" class="headerlink" title="问题："></a><strong>问题：</strong></h3><p>1.针对HDFS放置副本数默认为3的问题，如果并发的访问数超过3，那么会造成资源的的竞争访问，如果全部文件都设置为3，那么有些副本长期不使用，则会浪费存储空间。</p>
 <a id="more"></a>
 <p>2.针对访问文件的时候，由于默认的选择网络拓扑中就近的数据节点进行数据传输，没有考虑节点的负载性能。</p>
 <p>3.在最初放置副本的时候采取的是上篇博文的副本放置策略，但是在机架上选择节点都是随机的，将会影响集群的负载均衡。</p>
@@ -305,6 +320,17 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">HDFS</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -498,6 +524,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">first</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">HDFS</a>
               </li>
             
             <div class="clearfix"></div>

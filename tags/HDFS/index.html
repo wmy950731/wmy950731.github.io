@@ -6,22 +6,15 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>关于HDFS读写的详细过程以及现在研究的方向 | Learning HDFS</title>
+  <title>Tag: HDFS | Learning HDFS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="关于HDFS读取详细过程以及现在研究的方向">
-<meta property="og:type" content="article">
-<meta property="og:title" content="关于HDFS读写的详细过程以及现在研究的方向">
-<meta property="og:url" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Learning HDFS">
+<meta property="og:url" content="http://yoursite.com/tags/HDFS/index.html">
 <meta property="og:site_name" content="Learning HDFS">
-<meta property="og:description" content="关于HDFS读取详细过程以及现在研究的方向">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122153681.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122211381.png">
-<meta property="og:updated_time" content="2018-12-28T08:47:05.243Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于HDFS读写的详细过程以及现在研究的方向">
-<meta name="twitter:description" content="关于HDFS读取详细过程以及现在研究的方向">
-<meta name="twitter:image" content="http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122153681.png">
+<meta name="twitter:title" content="Learning HDFS">
   
     <link rel="alternative" href="/atom.xml" title="Learning HDFS" type="application/atom+xml">
   
@@ -157,239 +150,60 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-关于HDFS读写的详细过程以及现在研究的方向" class="article article-type-post " itemscope="" itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      关于HDFS读写的详细过程以及现在研究的方向
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2018" class="archive-year">2018</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2018/12/28/动态副本配置策略/" class="archive-article-date">
+  	<time datetime="2018-12-28T08:07:28.424Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-28</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2018/12/28/动态副本配置策略/">动态副本配置策略</a>
     </h1>
   
 
-        
-        <a href="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" class="archive-article-date">
-  	<time datetime="2018-12-26T07:30:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="关于HDFS读取详细过程以及现在研究的方向"><a href="#关于HDFS读取详细过程以及现在研究的方向" class="headerlink" title="关于HDFS读取详细过程以及现在研究的方向"></a>关于HDFS读取详细过程以及现在研究的方向</h1><a id="more"></a>
-<p>上一篇文章只是一个大概的读写过程，现在对这个过程进行细化。</p>
-<p>首先我们需要了解一些概念</p>
-<p><strong>元数据</strong></p>
-<p><strong>作用：</strong></p>
-<p>用于维护文件系统的目录，文件和数据块信息。</p>
-<p>元数据主要分为3类：文件属性信息（例如名称，大小，创建时间），文件到数据块的映射，以及数据块在datanode具体的分布。</p>
-<p><strong>Namenode</strong></p>
-<p><strong>作用：</strong></p>
-<p><strong>1</strong>.<strong>维护文件系统树以及所有文件和目录，也就是命名空间。</strong></p>
-<p>​        如何保存：</p>
-<p>​            主要通过两种文件来保存，命名空间镜像文件和编辑日志文件，这两种文件永久保存在namenode磁盘上。</p>
-<p>​            命名空间镜像文件（FSImage）是对元数据信息备份的二进制文件</p>
-<p>​            编辑日志文件（EditLog）是用于记录元数据变化的文件。</p>
-<p>​        运行过程：</p>
-<p>​            NameNode 在启动时，将磁盘上的 EditLog 和 FSImage 读入内存，随后 EditLog 中的操作记录被应用到此刻内存中的 FSImage 上，生成最新的元数据镜像信息后，再将FSImage 倒回磁盘。由于原先日志上的操作记录已被应用到了镜像文件上，因此旧的EditLog 会被清空，这个过程称为一次检查点 Checkpoint。数据块在datanode具体的分布信息并未持久化到本地，而是 DataNode 以块报告的方式上报给 NameNode，与检查点之后生成的最新 FSImage 形成最终的元数据文件。</p>
-<p><strong>2.监听和处理来自客户端和datanode的消息。</strong></p>
-<p>对于Datanode主要主要听集群状态，包括心跳响应（定期报告负载情况，没有报告则视为故障），数据块汇报，错误信息等，其中心跳响应也是在更新元数据的重要信息来源。</p>
-<p>注：HDFS内部通信都基于TCP/IP协议，datanode定期向namenode发送心跳信息。由此让namenode验证块映射和文件系统元数据</p>
-<p>对于客户端主要监听用户的操作命令。（例如读文件，写文件，删除，移动等）</p>
-<p>处理就是根据监听做出处理。</p>
-<p><strong>文件的读过程详解</strong></p>
-<p><img src="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122153681.png" alt="20171114122153681"></p>
-<p>1.首先客户端发出读文件请求，namenode返回给相应文件的元数据，获得这个文件的数据块位置列表。</p>
-<p>2.就近挑选一台datanode服务器，请求建立输入流 。</p>
-<p>如何挑选就近的datanode服务器：</p>
-<p>在返回文件的数据块位置列表中，会对数据块进行排序。</p>
-<p>排序规则：</p>
-<ul>
-<li>客户到数据块所在的Datanode的距离最近，这个是通过网络拓扑关系来进行计算，例如Client的网络路径为/dc1/r1/c1，那么路径为/dc1/r1/dn1的Datanode就比路径为/dc1/r2/dn2的距离小，/dc1/r1/dn1对应的数据块就会排在前面</li>
-<li>从上面一点可以推出，如果客户就是某个Datanode，恰好某个数据块的Datanode列表中包括该Datanode，则该Datanode对应的数据块排在前面</li>
-<li>数据块所在的Datanode列表中，如果其中某个Datanode在指定的时间内没有向Namenode发送心跳（默认值时间为30s），则该Datanode的状态即为STALE，具有该状态的Datanode对应的Block排在后面。</li>
-</ul>
-<p>3.当一个数据块读完成之后，客户会断开与其对应的Datanode的连接，再次寻找与其最近的数据块位置建立连接，重复这个过程，直到数据完全读取完毕。</p>
-<p>4.Datanode开始传输数据给客户端（从磁盘里面读取数据放入流，以packet为单位来做校验）。</p>
-<p>5.客户端以packet为单位接收数据。</p>
-<p><strong>写文件的详细过程</strong></p>
-<p>首先了解HDFS的存储单位block、packet与chunk。</p>
-<p>block （就是前文的数据块）<br>文件上传前需要分块，这个块就是block，一般为128MB，这个可以修改。因为块太小：寻址时间占比过高。块太大：Map任务数太少，作业执行速度变慢。它是最大的一个单位。</p>
-<p>packet<br>packet是第二大的单位，它是客户端向DataNode，或DataNode之间传输传数据的基本单位，默认64KB。</p>
-<p>chunk<br>chunk是最小的单位，它是客户端向DataNode，或DataNode之间进行传输数据校验的基本单位，默认512Byte，因为用作校验，故每个chunk需要带有4Byte的校验位。所以实际每个chunk写入packet的大小为516Byte。由此可见真实数据与校验值数据的比值约为128 : 1。（即64*1024 / 512）</p>
-<p>例如（1）在客户端向DataNode传数据的时候，输出数据流会有一个chunk buff，写满一个chunk后，会计算校验和并写入当前的chunk。之后再把带有校验和的chunk写入packet，当一个packet写满后，packet会进入dataQueue队列，其他的DataNode就是从这个dataQueue获取client端上传的数据并存储的。同时一个DataNode成功存储一个packet后之后会返回一个ack packet，放入ack Queue中。</p>
-<p><img src="/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/20171114122211381.png" alt="20171114122211381"></p>
-<p>1.首先客户端向NameNode发出写文件请求。</p>
-<p>2.检查文件是否存在，并检查权限，通过检查后，直接先把操作记录到上文提到的编辑日志文件，并返回输出流对象。</p>
-<p>3.客户端需要将数据块按照128MB进行切片。</p>
-<p>4.客户端根据Namenode返回的可分配的可写的Datanode列表以及自己写的数据发送给最近的第一个datanode。第一个datanode收到数据之后，会向下一个副本节点进行传输数据，副本收到数据之后再向下一个副本传输数据，依次类推。（传输过程如例（1）中的描述以一个packet为单位）</p>
-<p>那么如何选择副本的存储点，以及Namenode怎么选择返回的Datanode?</p>
-<p>根据以下放置策略</p>
-<p>副本放置策略：（考虑网络带宽、机架位置和数据块可靠性）</p>
-<p>(1)第一个数据块放置在与客户端相同的本地节点上。 </p>
-<p>(2)第二个数据块放置在与第一个数据块相同机架的不同节点上。 </p>
-<p>(3)第三个数据块放置在与第一个数据块不同机架的节点上。 </p>
-<p>5.每个DataNode写完一个块后，会返回确认信息。 如图所示，最后一个副本向前一个副本报告，依次类推往前报告。</p>
-<p>6.写完数据，关闭输出流，发送完成信号给Namenode(是当所有Datanode都完成接收数据才向Namenode报告)</p>
-<p><strong>现在HDFS中研究的一些问题</strong></p>
-<p><strong>问题1：</strong></p>
-<p>小文件浪费namenode空间，并且访问小文件客户端在NameNode 和 DataNode 之频繁交互，也会造成访问效率低下。（因为不管文件多小，都按一个数据块进行存储，都会给小文件分配相应的数据元）</p>
-<p>例如：每个文件对应的数据块的元数据信息为150bytes，对于6个1GB的文件，将它分成960个65MB的块，这样存储元消耗内存144KB，但是对于6000000个1KB的文件（总计60GB），这样存储元信息需要消耗大约9GB的内存。</p>
-<p><strong>问题2：</strong></p>
-<p>由于集群可能随时会增加，删除节点，所以很容易出现各个存储器存放数据量的不平衡。需要调整存储的位置，让访问更加平衡到每个数据节点。</p>
-<p>例如：</p>
-<p>本来整个集群处于各个数据节点都处于存储用量平衡的状态，但是由于集群的节点的增加删除，导致一些数据节点存的多，一些存的少。这个时候某个文件访问量突增，则某个数据节点访问量就会增加，可能让这个数据节点宕机。而一些数据节点处于闲置状态，就需要调整存储位置，达到再次的平衡。</p>
-<p><strong>问题3：</strong></p>
-<p>针对副本的放置数量的研究</p>
-<p>因为文件的热度不同，如果都设置相同的副本数，那么高并发访问文件会影响访问性能，如果文件热度低，则会浪费存储空间。</p>
-<p><strong>问题4：</strong></p>
-<p>针对监控datanode状态的心跳机制存在可能的误判，漏判的现象。因为心跳机制无法快速的判断宕机与网络拥堵的现象。</p>
-<p>例如：在规定的时间内datanode都会向namenode报告自己节点的负载信息，如果超过规定时间，则视为宕机，但是网络拥塞同样会让其超时。</p>
-<p><strong>问题5：</strong></p>
-<p>由于分布式存储的耗能较大。在不破坏数据块的可用性的前提下休眠部分数据节点尽可能的降低耗能。</p>
-<p>例如：</p>
-<p>由于集群数据节点多，同时开启大量数据节点对能耗要求巨大，但是某些数据节点内存储的文件并不属于热点文件，可以设计某些机制，在某些时刻让某些数据节点处于休眠状态。</p>
-<p><strong>总结：</strong></p>
-<p>对HDFS文件读取过程进行了细节分析，把更多的选择机制进行了描述。为后面的开发做好准备。</p>
+        <div class="article-info info-on-right">
+          
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">HDFS</a>
+        		</li>
+      		
+		</ul>
+	</div>
 
-      
+          
 
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
         </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
-        </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2018/12/26/关于HDFS读写的详细过程以及现在研究的方向/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2018/12/28/动态副本配置策略/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          动态副本配置策略
-        
-      </div>
-    </a>
   
   
-    <a href="/2018/12/25/关于HDFS读写理解/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">关于HDFS读写理解</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
-
-  
+    
 
 
           </div>
@@ -412,9 +226,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
