@@ -16,12 +16,12 @@
 <meta property="og:site_name" content="Learning HDFS">
 <meta property="og:description" content="这篇文章主要谈论的是心跳机制。">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/01/28/HDFS心跳机制/D:/vino/hexs/source/_posts/HDFS心跳机制/111.png">
-<meta property="og:updated_time" content="2019-01-28T14:26:21.623Z">
+<meta property="og:image" content="http://yoursite.com/2019/01/28/HDFS心跳机制/111.png">
+<meta property="og:updated_time" content="2019-01-28T14:30:26.226Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HDFS心跳机制">
 <meta name="twitter:description" content="这篇文章主要谈论的是心跳机制。">
-<meta name="twitter:image" content="http://yoursite.com/2019/01/28/HDFS心跳机制/D:/vino/hexs/source/_posts/HDFS心跳机制/111.png">
+<meta name="twitter:image" content="http://yoursite.com/2019/01/28/HDFS心跳机制/111.png">
   
     <link rel="alternative" href="/atom.xml" title="Learning HDFS" type="application/atom+xml">
   
@@ -196,7 +196,8 @@
 <p><strong>名字节点回馈心跳信息</strong></p>
 <p>所有名字节点对数据节点的操作，包括块删除，块增加，集群平衡，块恢复等都是通过心跳的回馈信息来传递的，<strong>名字节点不会主动的联系数据节点</strong>。其中它的命令主要由DatanodeCommand这个类的部分子类来实现。下面来介绍DatanodeCommand这个类中关于心跳回馈的子类</p>
 <p>名字节点对数据节点的指令有9种，每个指令都有一个编号，作为常量定义在DatanodeProtocol中。如图所示</p>
-<p><img src="/2019/01/28/HDFS心跳机制/D:/vino\hexs\source\_posts\HDFS心跳机制\111.png" alt="111">在收到信息之后，名字节点返回的是一个<strong>DatanodeCommand对象数组</strong>，也就是带回来了数据节点的所有操作。那么最常见的触发命令是块的复制，块的删除，数据块的恢复。</p>
+<p><img src="/2019/01/28/HDFS心跳机制/111.png" alt="111"></p>
+<p>在收到信息之后，名字节点返回的是一个<strong>DatanodeCommand对象数组</strong>，也就是带回来了数据节点的所有操作。那么最常见的触发命令是块的复制，块的删除，数据块的恢复。</p>
 <p>举例说明：</p>
 <p>块的删除：</p>
 <p>（1）例如用户需要删除文件系统中的某个文件，在完成名字节点上的逻辑删除之后，还要进行物理删除，则用心跳的回馈来传递删除块的信息，让具体的某个数据节点进行删除操作。</p>
